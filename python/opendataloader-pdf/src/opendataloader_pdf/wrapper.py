@@ -1,3 +1,4 @@
+import argparse
 import subprocess
 import sys
 import importlib.resources as importlib_resources
@@ -18,8 +19,8 @@ def run(
     generate_annotated_pdf: bool = False,
     keep_line_breaks: bool = False,
     content_safety_off: str = None,
-    html_in_markdown: bool = False,
-    add_image_to_markdown: bool = False,
+    markdown_with_html: bool = False,
+    markdown_with_images: bool = False,
     no_json: bool = False,
     debug: bool = False,
 ):
@@ -34,9 +35,9 @@ def run(
         generate_markdown: If True, generates a Markdown output file.
         generate_html: If True, generates an HTML output file.
         generate_annotated_pdf: If True, generates an annotated PDF output file.
+        markdown_with_html: If True, uses HTML in the Markdown output.
+        markdown_with_images: If True, adds images to the Markdown output.
         keep_line_breaks: If True, keeps line breaks in the output.
-        html_in_markdown: If True, uses HTML in the Markdown output.
-        add_image_to_markdown: If True, adds images to the Markdown output.
         no_json: If True, disable the JSON output.
         debug: If True, prints all messages from the CLI to the console during execution.
 
@@ -67,9 +68,9 @@ def run(
         args.append("--pdf")
     if keep_line_breaks:
         args.append("--keep-line-breaks")
-    if html_in_markdown:
+    if markdown_with_html:
         args.append("--markdown-with-html")
-    if add_image_to_markdown:
+    if markdown_with_images:
         args.append("--markdown-with-images")
     if no_json:
         args.append("--no-json")
@@ -135,3 +136,82 @@ def run(
         if e.stdout:
             print(f"Stdout: {e.stdout}", file=sys.stderr)
         raise e
+
+
+def main(argv=None) -> int:
+    """CLI entry point for running the wrapper from the command line."""
+    parser = argparse.ArgumentParser(
+        description="Run the opendataloader-pdf CLI using the bundled JAR."
+    )
+    parser.add_argument("input_path", help="Path to the input PDF file or directory.")
+    parser.add_argument(
+        "-o",
+        "--output-dir",
+        dest="output_folder",
+        help="Directory where outputs are written.",
+    )
+    parser.add_argument("-p", "--password", help="Password for encrypted PDFs.")
+    parser.add_argument(
+        "--replace-invalid-chars",
+        help="Replacement character for invalid or unrecognized characters.",
+    )
+    parser.add_argument(
+        "--content-safety-off",
+        help="Disable content safety filtering (expects the desired mode).",
+    )
+    parser.add_argument(
+        "--markdown",
+        dest="generate_markdown",
+        action="store_true",
+        help="Generate Markdown output.",
+    )
+    parser.add_argument(
+        "--html",
+        dest="generate_html",
+        action="store_true",
+        help="Generate HTML output.",
+    )
+    parser.add_argument(
+        "--pdf",
+        dest="generate_annotated_pdf",
+        action="store_true",
+        help="Generate annotated PDF output.",
+    )
+    parser.add_argument(
+        "--keep-line-breaks",
+        action="store_true",
+        help="Preserve line breaks in text output.",
+    )
+    parser.add_argument(
+        "--markdown-with-html",
+        action="store_true",
+        help="Allow raw HTML within Markdown output.",
+    )
+    parser.add_argument(
+        "--markdown-with-images",
+        action="store_true",
+        help="Embed images in Markdown output.",
+    )
+    parser.add_argument(
+        "--no-json",
+        action="store_true",
+        help="Disable JSON output generation.",
+    )
+    parser.add_argument(
+        "--debug",
+        action="store_true",
+        help="Stream CLI logs directly to stdout.",
+    )
+    args = parser.parse_args(argv)
+
+    try:
+        run(**vars(args))
+    except FileNotFoundError as err:
+        print(err, file=sys.stderr)
+        return 1
+    except subprocess.CalledProcessError as err:
+        return err.returncode or 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())

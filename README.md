@@ -77,6 +77,7 @@ pip install -U opendataloader-pdf
 
 - input_path can be either the path to a single document or the path to a folder.
 - If you don’t specify an output_folder, the output data will be saved in the same directory as the input document.
+- If you want to see CLI messages printed to the console during execution, set `debug=True`.
 
 ```python
 import opendataloader_pdf
@@ -88,6 +89,12 @@ opendataloader_pdf.run(
     generate_html=True,
     generate_annotated_pdf=True,
 )
+```
+
+- If you want to run it via CLI, you can use the following command:
+
+```sh
+opendataloader-pdf path/to/document.pdf --markdown --html --pdf
 ```
 
 ### Function: run()
@@ -105,8 +112,8 @@ The main function to process PDFs.
 | `generate_html`          | `bool` | No       | `False`      | If `True`, generates an HTML output file.                                                                                                   |
 | `generate_annotated_pdf` | `bool` | No       | `False`      | If `True`, generates an annotated PDF output file.                                                                                          |
 | `keep_line_breaks`       | `bool` | No       | `False`      | If `True`, keeps line breaks in the output.                                                                                                 |
-| `html_in_markdown`       | `bool` | No       | `False`      | If `True`, uses HTML in the Markdown output.                                                                                                |
-| `add_image_to_markdown`  | `bool` | No       | `False`      | If `True`, adds images to the Markdown output.                                                                                              |
+| `markdown_with_html`     | `bool` | No       | `False`      | If `True`, uses HTML in the Markdown output.                                                                                                |
+| `markdown_with_image`    | `bool` | No       | `False`      | If `True`, adds images to the Markdown output.                                                                                              |
 | `no_json`                | `bool` | No       | `False`      | If `True`, disables the JSON output.                                                                                                        |
 | `debug`                  | `bool` | No       | `False`      | If `True`, prints CLI messages to the console during execution.                                                                             |
 
